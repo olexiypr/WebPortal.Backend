@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebPortal.DAL", "WebPortal.DAL", "{3DA1B3F8-7DD9-47EF-96B8-CE40C0C8DC43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPortal.Domain", "WebPortal.DAL\WebPortal.Domain\WebPortal.Domain.csproj", "{12D1C36F-DBC8-4149-ADAD-6D0D3A86749F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPortal.Persistence", "WebPortal.DAL\WebPortal.Persistence\WebPortal.Persistence.csproj", "{70F00851-25E3-4EDD-9F56-1F4E1DA14732}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebPortal.BLL", "WebPortal.BLL", "{CCE86DD8-2AE4-4947-9595-C5CFF20F9C14}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebPortal.WebAPI", "WebPortal.WebAPI", "{0BEB2809-30A8-4F94-A6F1-4473E77A59AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPortal.WebAPI", "WebPortal.WebAPI\WebPortal.WebAPI.csproj", "{56D7C7DA-F330-4635-A5DC-70A410C4FF20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPortal.Application", "WebPortal.Application\WebPortal.Application.csproj", "{B10E4FC9-2D2F-4B09-9285-E4421B57AC17}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{12D1C36F-DBC8-4149-ADAD-6D0D3A86749F} = {3DA1B3F8-7DD9-47EF-96B8-CE40C0C8DC43}
+		{70F00851-25E3-4EDD-9F56-1F4E1DA14732} = {3DA1B3F8-7DD9-47EF-96B8-CE40C0C8DC43}
+		{56D7C7DA-F330-4635-A5DC-70A410C4FF20} = {0BEB2809-30A8-4F94-A6F1-4473E77A59AC}
+		{B10E4FC9-2D2F-4B09-9285-E4421B57AC17} = {CCE86DD8-2AE4-4947-9595-C5CFF20F9C14}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{12D1C36F-DBC8-4149-ADAD-6D0D3A86749F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12D1C36F-DBC8-4149-ADAD-6D0D3A86749F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12D1C36F-DBC8-4149-ADAD-6D0D3A86749F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12D1C36F-DBC8-4149-ADAD-6D0D3A86749F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70F00851-25E3-4EDD-9F56-1F4E1DA14732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70F00851-25E3-4EDD-9F56-1F4E1DA14732}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70F00851-25E3-4EDD-9F56-1F4E1DA14732}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70F00851-25E3-4EDD-9F56-1F4E1DA14732}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56D7C7DA-F330-4635-A5DC-70A410C4FF20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56D7C7DA-F330-4635-A5DC-70A410C4FF20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56D7C7DA-F330-4635-A5DC-70A410C4FF20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56D7C7DA-F330-4635-A5DC-70A410C4FF20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B10E4FC9-2D2F-4B09-9285-E4421B57AC17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B10E4FC9-2D2F-4B09-9285-E4421B57AC17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B10E4FC9-2D2F-4B09-9285-E4421B57AC17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B10E4FC9-2D2F-4B09-9285-E4421B57AC17}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
