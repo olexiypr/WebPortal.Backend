@@ -19,7 +19,7 @@ public static class ClaimsPrincipalExtensions
             )?.Value, out var userId);
         if (!result)
         {
-            userId = Guid.NewGuid();
+            throw new UserAccessDeniedExceptions(principal.ToString());
         }
         return userId;
     }

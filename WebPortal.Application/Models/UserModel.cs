@@ -10,5 +10,4 @@ public class UserModel
     public string Name { get; set; }
     public string? Description { get; set; }
     public string? Avatar { get; set; }
-    public IEnumerable<ArticlePreviewModel>? Articles { get; set; }
 }

@@ -31,11 +31,7 @@ public class UserService : IUserService
     
     public async Task<UserModel> GetUserByIdAsync(Guid id)
     {
-        var user = await _userRepository.Query()
-            .Include(user => user.Articles)
-            .ThenInclude(article => article.Tags)
-            .Include(user => user.Recommendation)
-            .FirstOrDefaultAsync(u => u.Id == id);
+        var user = await _userRepository.GetByIdAsync(id);
         /*if (user.Avatar!.Length > 0)
         {
             user.Avatar = GetAvatarLink(user.Id);
@@ -51,9 +47,6 @@ public class UserService : IUserService
     public async Task<UserModel> GetUserByNickName(string nickName)
     {
         var user = await _userRepository.Query()
-            .Include(user => user.Articles)
-            .ThenInclude(article => article.Tags)
-            .Include(user => user.Recommendation)
             .FirstOrDefaultAsync(u => u.NickName == nickName);
         if (user == null)
         {

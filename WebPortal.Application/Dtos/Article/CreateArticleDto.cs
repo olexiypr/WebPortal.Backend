@@ -5,7 +5,6 @@ namespace WebPortal.Application.Dtos.Article;
 
 public class CreateArticleDto
 {
-    public Guid AuthorId { get; set; }
     public ArticleStatuses Status { get; set; }
     public string Name { get; set; }
     public Guid CategoryId { get; set; }

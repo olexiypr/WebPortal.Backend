@@ -24,5 +24,6 @@ public class ArticleMapper : Profile
 
         CreateMap<UpdateArticleDataDto, Article>();
         CreateMap<Article, ArticlePreviewModel>().ReverseMap();
+        CreateMap<Article, UserArticlePreviewModel>();
     }
 }

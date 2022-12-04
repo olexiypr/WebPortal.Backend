@@ -5,5 +5,5 @@ namespace WebPortal.Application.Services.Interfaces;
 
 public interface ITagService
 {
-    public Task AssignTagsToArticle(IEnumerable<TagDto> tagDtos, Article article);
+    public Task AssignTagsToArticle(IEnumerable<TagDto>? tagDtos, Article article);
 }

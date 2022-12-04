@@ -5,6 +5,7 @@ using WebPortal.Application.Dtos.Article;
 using WebPortal.Application.Dtos.Complain;
 using WebPortal.Application.Models.Article;
 using WebPortal.Application.Services.Interfaces;
+using WebPortal.Domain.Enums;
 
 namespace WebPortal.WebAPI.Controllers;
 
@@ -23,6 +24,13 @@ public class ArticleController : BaseController
         return Ok(article);
     }
 
+    [HttpGet]
+    [Authorize]
+    public async Task<ActionResult<IEnumerable<ArticleModel>>> GetUserArticles([FromQuery] ArticleStatuses status)
+    {
+        var articles = await _articleService.GetUserArticles(status);
+        return Ok(articles);
+    }
     [HttpGet]
     [ActionName("popular")]
     public async Task<ActionResult<IEnumerable<ArticlePreviewModel>>> GetPopularArticles([FromQuery] string period)

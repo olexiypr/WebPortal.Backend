@@ -18,8 +18,12 @@ public class TagService : ITagService
         _articleRepository = articleRepository;
     }
 
-    public async Task AssignTagsToArticle(IEnumerable<TagDto> tagDtos, Article article)
+    public async Task AssignTagsToArticle(IEnumerable<TagDto>? tagDtos, Article article)
     {
+        if (tagDtos == null)
+        {
+            return;
+        }
         var tags = await _tagRepository.Query()
             .Include(tag => tag.Articles)
             .Where(tag => tagDtos.Select(dto => dto.Name).Contains(tag.Name))

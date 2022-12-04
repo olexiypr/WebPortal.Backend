@@ -46,9 +46,30 @@ public class ArticleService : IArticleService
         {
             throw new NotFoundException(nameof(Article), id);
         }
+        ViewArticle(article);
+        await _articleRepository.SaveChangesAsync();
         return _mapper.Map<ArticleModel>(article);
     }
 
+    public async Task<IEnumerable<UserArticlePreviewModel>> GetUserArticles(ArticleStatuses status)
+    {
+        var userId = _contextAccessor.HttpContext!.User.GetCurrentUserId();
+        var articles = await _articleRepository.Query()
+            .Where(article => article.Status == status && article.AuthorId == userId)
+            .ToListAsync();
+        var articlePreview = _mapper
+            .ProjectTo<UserArticlePreviewModel>(articles.AsQueryable())
+            .ToList();
+        return articlePreview;
+    }
+
+    private void ViewArticle(Article article)
+    {
+        article.CountViews++;
+        article.CountViewsPerDay++;
+        article.CountViewsPerWeek++;
+        article.CountViewsPerMonth++;
+    }
     public async Task<IEnumerable<ArticlePreviewModel>> GetPopularArticles(string period)
     {
         var articles = period switch
@@ -65,7 +86,7 @@ public class ArticleService : IArticleService
                 .OrderByDescending(article => article.CountViewsPerMonth)
                 .Take(10)
                 .ToListAsync(),
-            _ => throw new ArgumentOutOfRangeException(nameof(period), period, null)
+            _ => throw new ArgumentException(nameof(period), period)
         };
         return _mapper.ProjectTo<ArticlePreviewModel>(articles.AsQueryable());
     }
@@ -80,17 +101,13 @@ public class ArticleService : IArticleService
         {
             throw new ArgumentException();
         }
-        /*var userId = _contextAccessor.HttpContext!.User.GetCurrentUserId(_userRepository);
-        if (articleDto.AuthorId != userId)
-        {
-            throw new UserAccessDeniedExceptions(nameof(articleDto));
-        }*/
+        var userId = _contextAccessor.HttpContext!.User.GetCurrentUserId();
         article.KeyWords = GetKeyWords(article.Text, article.Name);
-        await _tagService.AssignTagsToArticle(articleDto.Tags, article);
+        await _tagService.AssignTagsToArticle(articleDto!.Tags, article);
         await _articleRepository.AddAsync(article);
         await _articleRepository.SaveChangesAsync();
         var articleModel = _mapper.Map<ArticleModel>(article);
-        articleModel.AuthorNickName = (await _userRepository.GetByIdAsync(articleDto.AuthorId)).NickName;
+        articleModel.AuthorNickName = (await _userRepository.GetByIdAsync(userId)).NickName;
         return articleModel;
     }
 
