@@ -21,8 +21,9 @@ create articles, modify them, publish, delete, upload an avatar, change informat
 - API documentation with Swagger and Swagger UI
 
 Features:
-- Memory caching
-- Logging
-- Live chat with SignalR
-- Сonfirmation registration and password recovery by email
-- Unit tests
+- [ ] Memory caching
+- [ ] Logging
+- [ ] Live chat with SignalR
+- [ ] Сonfirmation registration and password recovery by email
+- [ ] Unit tests
+- [ ] Password hashing
