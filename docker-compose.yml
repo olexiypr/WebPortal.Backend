@@ -5,7 +5,7 @@ services:
     build:
       .
     ports:
-      - 5000:7150
+      - 7150:80
   
   db:
     image: postgres:12
@@ -15,18 +15,18 @@ services:
       POSTGRES_USER: aloshaprokopenko5
       POSTGRES_DB: WebPortalDb
 
-  proxy:
-    image: nginx:mainline
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    ports:
-      - 8081:8002
+ # proxy:
+   # image: nginx:mainline
+   # volumes:
+   #   - ./nginx.conf:/etc/nginx/nginx.conf
+   # ports:
+    #  - 8081:8002
 
-  frontend:
-    image: olexiypr/frontend
-    build:
-      ./../../../WebstormProjects/WebPortal.Frontend/
-    ports:
-      - 8001:80
+  #frontend:
+   # image: olexiypr/frontend
+   # build:
+   #   ./../../../WebstormProjects/WebPortal.Frontend/
+   # ports:
+   #   - 8001:80
       
         

@@ -18,10 +18,12 @@ public class RegisterService : IRegisterService
     private readonly IMapper _mapper;
     private readonly IRepository<User> _userRepository;
     private readonly IIdentityService _identityService;
+    private readonly IImageService _imageService;
     private readonly IWebHostEnvironment _environment;
-    public RegisterService(IMapper mapper, IRepository<User> userRepository, IIdentityService identityService, IWebHostEnvironment environment)
+    public RegisterService(IMapper mapper, IRepository<User> userRepository, IIdentityService identityService, IWebHostEnvironment environment, IImageService imageService)
     {
         _environment = environment;
+        _imageService = imageService;
         (_mapper, _userRepository, _identityService) = (mapper, userRepository, identityService);
     }
 
@@ -30,31 +32,16 @@ public class RegisterService : IRegisterService
         var user = _mapper.Map<User>(registerUserDto);
         user.RegistrationDate = DateTime.Now;
         user.Role = "user";
+        await _userRepository.AddAsync(user);
+        
         if (registerUserDto.Avatar != null)
         {
-            SetAvatar(user, registerUserDto.Avatar);
+            await _imageService.SetAvatar(user, registerUserDto.Avatar);
         }
-        await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
         var authDto = _mapper.Map<AuthDto>(user);
         var token = await _identityService.GetToken(authDto);
         return (token, _mapper.Map<UserModel>(user));
-    }
-
-    private async void SetAvatar(User user, IFormFile avatar)
-    {
-        var path = $"/Avatars/{user.Id}{Path.GetFileName(avatar.FileName)}";
-        try
-        {
-            await using var fileStream = new FileStream(_environment.WebRootPath + path, FileMode.Create);
-            await avatar.CopyToAsync(fileStream);
-            user.Avatar = path;
-        }
-        catch (ArgumentException e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
     }
     public async Task<(string, UserModel)> LoginUserAsync(AuthDto authDto)
     {

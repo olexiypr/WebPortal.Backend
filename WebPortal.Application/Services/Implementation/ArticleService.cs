@@ -24,13 +24,15 @@ public class ArticleService : IArticleService
     /*private readonly IRepository<Tag> _tagRepository;*/
     private readonly IRepository<ArticleCategory> _categoryRepository;
     private readonly ITagService _tagService;
+    private readonly IPaginationService _paginationService;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IMapper _mapper;
 
-    public ArticleService(IRepository<Article> articleRepository, IRepository<User> userRepository, IRepository<ArticleCategory> categoryRepository,IMapper mapper, IHttpContextAccessor contextAccessor, ITagService tagService)
+    public ArticleService(IRepository<Article> articleRepository, IRepository<User> userRepository, IRepository<ArticleCategory> categoryRepository,IMapper mapper, IHttpContextAccessor contextAccessor, ITagService tagService, IPaginationService paginationService)
     {
         _contextAccessor = contextAccessor;
         _tagService = tagService;
+        _paginationService = paginationService;
         (_articleRepository, _userRepository, _categoryRepository, _mapper) = (articleRepository,
             userRepository, categoryRepository, mapper);
     }
@@ -51,16 +53,17 @@ public class ArticleService : IArticleService
         return _mapper.Map<ArticleModel>(article);
     }
 
-    public async Task<IEnumerable<UserArticlePreviewModel>> GetUserArticles(ArticleStatuses status)
+    public async Task<IEnumerable<UserArticlePreviewModel>> GetUserArticles(ArticleStatuses status, PaginationDto? paginationDto)
     {
         var userId = _contextAccessor.HttpContext!.User.GetCurrentUserId();
         var articles = await _articleRepository.Query()
             .Where(article => article.Status == status && article.AuthorId == userId)
             .ToListAsync();
-        var articlePreview = _mapper
-            .ProjectTo<UserArticlePreviewModel>(articles.AsQueryable())
+        var articlePreviews = _mapper
+            .ProjectTo<UserArticlePreviewModel>
+                (_paginationService.GetArticlesByPagination(articles, paginationDto).AsQueryable())
             .ToList();
-        return articlePreview;
+        return articlePreviews;
     }
 
     private void ViewArticle(Article article)
@@ -70,19 +73,22 @@ public class ArticleService : IArticleService
         article.CountViewsPerWeek++;
         article.CountViewsPerMonth++;
     }
-    public async Task<IEnumerable<ArticlePreviewModel>> GetPopularArticles(string period)
+    public async Task<IEnumerable<ArticlePreviewModel>> GetPopularArticles(string period, PaginationDto? paginationDto)
     {
         var articles = period switch
         {
             "day" => await _articleRepository.Query()
+                .Include(article => article.Tags)
                 .OrderByDescending(article => article.CountViewsPerDay)
                 .Take(10)
                 .ToListAsync(),
             "week" => await _articleRepository.Query()
+                .Include(article => article.Tags)
                 .OrderByDescending(article => article.CountViewsPerWeek)
                 .Take(10)
                 .ToListAsync(),
             "month" => await _articleRepository.Query()
+                .Include(article => article.Tags)
                 .OrderByDescending(article => article.CountViewsPerMonth)
                 .Take(10)
                 .ToListAsync(),

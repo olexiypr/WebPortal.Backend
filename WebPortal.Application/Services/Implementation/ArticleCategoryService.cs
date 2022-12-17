@@ -15,20 +15,22 @@ namespace WebPortal.Application.Services.Implementation;
 public class ArticleCategoryService : IArticleCategoryService
 {
     private readonly IRepository<ArticleCategory> _articleCategoryRepository;
+    private readonly IPaginationService _paginationService;
     private readonly IMapper _mapper;
-    public ArticleCategoryService(IRepository<ArticleCategory> articleCategoryRepository, IMapper mapper) =>
+    public ArticleCategoryService(IRepository<ArticleCategory> articleCategoryRepository, IMapper mapper, IPaginationService paginationService)
+    {
+        _paginationService = paginationService;
         (_articleCategoryRepository, _mapper) = (articleCategoryRepository, mapper);
+    }
 
     public async Task<IEnumerable<ArticleCategoryModel>> GetAllCategories()
     {
         var categories = await _articleCategoryRepository.Query().ToListAsync();
         return _mapper.ProjectTo<ArticleCategoryModel>(categories.AsQueryable());
     }
-
+    
     public async Task<ArticleCategoryModel> GetArticlesInCategory(Guid categoryId, PaginationDto paginationDto)
     {
-        var countArticles = paginationDto.Count;
-        var pageNumber = paginationDto.PageNumber;
         var category = await _articleCategoryRepository
             .Query()
             .Include(articleCategory => articleCategory.Articles)
@@ -40,24 +42,10 @@ public class ArticleCategoryService : IArticleCategoryService
         {
             throw new NotFoundException(nameof(ArticleCategory), categoryId);
         }
-        if (category.Articles!.Count == 0 || category.Articles.Count <= countArticles)
-        {
-            var categoryModel = _mapper.Map<ArticleCategoryModel>(category);
-            categoryModel.Articles = category.Articles.Select(article => _mapper.Map<ArticlePreviewModel>(article));
-            return categoryModel;
-        }
-
-        if (category.Articles.Count < countArticles * pageNumber)
-        {
-            throw new ArgumentException(nameof(Article), categoryId.ToString());
-        }
-        if (category.Articles.Skip(countArticles * pageNumber).Count() < countArticles)
-        {
-            category.Articles = category.Articles.Skip(countArticles * pageNumber).ToArray();
-            return _mapper.Map<ArticleCategoryModel>(category);
-        }
-        category.Articles = category.Articles.Skip(countArticles * pageNumber).Take(countArticles).ToArray();
-        return _mapper.Map<ArticleCategoryModel>(category);
+        var articlePreviews = _paginationService.GetArticlesByPagination(category.Articles, paginationDto);
+        var categoryModel = _mapper.Map<ArticleCategoryModel>(category);
+        categoryModel.Articles = articlePreviews;
+        return categoryModel;
     }
 
     public async Task<ArticleCategoryModel> CreateArticleCategory(CreateArticleCategoryDto createArticleCategoryDto)

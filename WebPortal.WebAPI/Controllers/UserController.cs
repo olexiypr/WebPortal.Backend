@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.Complain;
 using WebPortal.Application.Dtos.User;
+using WebPortal.Application.Exceptions;
 using WebPortal.Application.Models;
 using WebPortal.Application.Services.Interfaces;
 
@@ -23,7 +24,14 @@ public class UserController : BaseController
         var user = await _userService.GetUserByNickName(nickName);
         return Ok(user);
     }
-    
+
+    [HttpGet]
+    [Authorize]
+    public async Task<ActionResult<UserModel>> GetUser()
+    {
+        var user = await _userService.GetUserByIdAsync(HttpContext.User.GetCurrentUserId());
+        return Ok(user);
+    }
     [HttpPut]
     [ActionName("user_data")]
     [Authorize]

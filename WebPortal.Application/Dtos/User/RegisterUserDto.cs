@@ -11,5 +11,4 @@ public class RegisterUserDto
     public string Name { get; set; }
     public string? Description { get; set; }
     public IFormFile? Avatar { get; set; }
-    public RecommendationDto? Recommendation { get; set; }
 }

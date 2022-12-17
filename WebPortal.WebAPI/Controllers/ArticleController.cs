@@ -26,16 +26,18 @@ public class ArticleController : BaseController
 
     [HttpGet]
     [Authorize]
-    public async Task<ActionResult<IEnumerable<ArticleModel>>> GetUserArticles([FromQuery] ArticleStatuses status)
+    public async Task<ActionResult<IEnumerable<UserArticlePreviewModel>>> GetUserArticles([FromQuery] ArticleStatuses status, 
+        [FromQuery] PaginationDto? paginationDto)
     {
-        var articles = await _articleService.GetUserArticles(status);
+        var articles = await _articleService.GetUserArticles(status, paginationDto);
         return Ok(articles);
     }
     [HttpGet]
     [ActionName("popular")]
-    public async Task<ActionResult<IEnumerable<ArticlePreviewModel>>> GetPopularArticles([FromQuery] string period)
+    public async Task<ActionResult<IEnumerable<ArticlePreviewModel>>> GetPopularArticles([FromQuery] string period, 
+        [FromQuery] PaginationDto? paginationDto)
     {
-        var articles = await _articleService.GetPopularArticles(period);
+        var articles = await _articleService.GetPopularArticles(period, paginationDto);
         return Ok(articles);
     }
     [HttpPost]

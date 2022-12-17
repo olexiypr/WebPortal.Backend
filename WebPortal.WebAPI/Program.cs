@@ -44,9 +44,16 @@ app.UseCors("ApplyAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseEndpoints(endpoints => endpoints.MapControllers());
-/*using var scope = app.Services.CreateScope();
+
+using var scope = app.Services.CreateScope();
 var serviceProvider = scope.ServiceProvider;
 var context = serviceProvider.GetRequiredService<WebPortalDbContext>();
-context.Database.EnsureCreated();*/
-
+try
+{
+    context.Database.EnsureCreated();
+}
+catch (Exception e)
+{
+    Console.WriteLine(e);
+}
 app.Run();

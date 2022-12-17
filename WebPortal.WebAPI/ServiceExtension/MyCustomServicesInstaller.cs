@@ -14,6 +14,7 @@ public class MyCustomServicesInstaller : IInstaller
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IRegisterService, RegisterService>();
+        services.AddScoped<IPaginationService, PaginationService>();
         services.AddScoped<ITagService, TagService>();
         services.AddScoped<ICommentaryService, CommentaryService>();
         services.AddScoped<IArticleService, ArticleService>();
