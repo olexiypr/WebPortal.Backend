@@ -1,4 +1,4 @@
-# WebPortal 
+# WebPortal ![Build](https://github.com/olexiypr/WebPortal.Backend/actions/workflows/dotnet.yml/badge.svg?branch=main)
 Platform where people can create articles
 
 # Functionality
