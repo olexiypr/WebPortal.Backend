@@ -1,7 +1,7 @@
 # WebPortal 
 Platform where people can create articles
 \
-![Build](https://github.com/olexiypr/WebPortal.Backend/actions/workflows/develop_webportalwebapii.yml/badge.svg?branch=main)
+![Build](https://github.com/olexiypr/WebPortal.Backend/actions/workflows/develop_webportalwebapii.yml/badge.svg?branch=develop)
 
 
 # Functionality
