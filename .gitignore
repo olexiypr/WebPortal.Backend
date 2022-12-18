@@ -16,3 +16,4 @@ obj/
 .idea/
 *.sln.iml
 *.conf
+/WebPortal.DAL/WebPortal.Persistence/Context/ConnectionStringConfig.cs

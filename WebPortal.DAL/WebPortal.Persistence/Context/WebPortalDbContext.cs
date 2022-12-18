@@ -29,8 +29,8 @@ public class WebPortalDbContext : DbContext
             .AddJsonFile("appsettings.json")
             .Build();
         var connectionString = configuration["DbConnection"];*/
-        //var connectionString = "Host=localhost;Username=aloshaprokopenko5;Password=787898;Database=WebPortalDb"; //localhost and docker
-        var connectionString = "Host=webportal.postgres.database.azure.com;Username=aloshaprokopenko5;Password=787898787899619aA;Database=WebPortalDb"; //azure postgres
+        //var connectionString =  
+        var connectionString = ConnectionStringConfig.CsLocalhost;
         optionsBuilder.UseNpgsql(connectionString);
         optionsBuilder.EnableSensitiveDataLogging();
     }

@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using WebPortal.Application.Auth;
 using WebPortal.Persistence.Context;
@@ -21,6 +22,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMyAuthentication();
+builder.Services.AddMvc();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ApplyAll", policyBuilder =>
@@ -36,6 +38,8 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 var app = builder.Build();
 
 app.UseDeveloperExceptionPage();
+app.UseStaticFiles();
+app.UseDefaultFiles();
 app.UseCustomExceptionHandler();
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -43,7 +47,11 @@ app.UseRouting();
 app.UseCors("ApplyAll");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseEndpoints(endpoints => endpoints.MapControllers());
+/*app.UseMvc();*/
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 using var scope = app.Services.CreateScope();
 var serviceProvider = scope.ServiceProvider;
