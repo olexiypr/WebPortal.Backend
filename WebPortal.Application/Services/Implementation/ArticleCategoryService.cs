@@ -42,7 +42,8 @@ public class ArticleCategoryService : IArticleCategoryService
         {
             throw new NotFoundException(nameof(ArticleCategory), categoryId);
         }
-        var articlePreviews = _paginationService.GetArticlesByPagination(category.Articles, paginationDto);
+        var articlePreviews = _mapper.ProjectTo<ArticlePreviewModel>(
+            _paginationService.GetArticlesByPagination(category.Articles, paginationDto).AsQueryable());
         var categoryModel = _mapper.Map<ArticleCategoryModel>(category);
         categoryModel.Articles = articlePreviews;
         return categoryModel;

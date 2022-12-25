@@ -6,6 +6,7 @@ using Npgsql.PostgresTypes;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.Article;
 using WebPortal.Application.Exceptions;
+using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
 using WebPortal.Application.Models.Article;
 using WebPortal.Application.Services.Interfaces;
@@ -57,8 +58,13 @@ public class ArticleService : IArticleService
     {
         var userId = _contextAccessor.HttpContext!.User.GetCurrentUserId();
         var articles = await _articleRepository.Query()
+            .Include(article => article.Tags)
             .Where(article => article.Status == status && article.AuthorId == userId)
             .ToListAsync();
+        if (articles.Count == 0)
+        {
+            return Array.Empty<UserArticlePreviewModel>();
+        }
         var articlePreviews = _mapper
             .ProjectTo<UserArticlePreviewModel>
                 (_paginationService.GetArticlesByPagination(articles, paginationDto).AsQueryable())
@@ -142,6 +148,8 @@ public class ArticleService : IArticleService
         {
             await _tagService.AssignTagsToArticle(updateArticleDataDto.Tags, article);
         }
+
+        article.Status = updateArticleDataDto.Status ?? article.Status;
         await _articleRepository.SaveChangesAsync();
         var articleModel = _mapper.Map<ArticleModel>(article);
         articleModel.Tags = _mapper.ProjectTo<TagModel>(article.Tags.AsQueryable());

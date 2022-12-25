@@ -1,9 +1,7 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using WebPortal.Domain.User;
-using WebPortal.Persistence.Infrastructure;
+using WebPortal.Application.Exceptions;
 
-namespace WebPortal.Application.Exceptions;
+namespace WebPortal.Application.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {

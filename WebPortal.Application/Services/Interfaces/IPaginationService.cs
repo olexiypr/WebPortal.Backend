@@ -6,6 +6,6 @@ namespace WebPortal.Application.Services.Interfaces;
 
 public interface IPaginationService
 {
-    IEnumerable<ArticlePreviewModel>
+    IEnumerable<Article>
         GetArticlesByPagination(IEnumerable<Article> articles, PaginationDto? paginationDto);
 }

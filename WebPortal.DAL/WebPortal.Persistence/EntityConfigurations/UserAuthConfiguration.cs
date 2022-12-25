@@ -11,6 +11,5 @@ public class UserAuthConfiguration : IEntityTypeConfiguration<UserAuth>
         builder.ToTable("user_auth");
         builder.HasKey(auth => auth.Id);
         builder.HasAlternateKey(auth => auth.Email);
-        
     }
 }

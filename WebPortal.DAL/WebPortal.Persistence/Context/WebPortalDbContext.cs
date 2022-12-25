@@ -21,20 +21,7 @@ public class WebPortalDbContext : DbContext
     public DbSet<ArticleCategory> ArticleCategories { get; set; }
     public DbSet<ArticleComplaint> ArticleReports { get; set; }
     public DbSet<UserComplaint> UserReports { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        /*var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
-            .Build();
-        var connectionString = configuration["DbConnection"];*/
-        //var connectionString =  
-        var connectionString = ConnectionStringConfig.CsLocalhost;
-        optionsBuilder.UseNpgsql(connectionString);
-        optionsBuilder.EnableSensitiveDataLogging();
-    }
-
+    
     public WebPortalDbContext(DbContextOptions<WebPortalDbContext> options) : base(options) {}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using WebPortal.Application.Dtos.User;
 using WebPortal.Application.Exceptions;
+using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
 using WebPortal.Application.Models.Article;
 using WebPortal.Application.Services.Interfaces;

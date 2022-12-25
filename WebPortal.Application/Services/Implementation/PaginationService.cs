@@ -15,18 +15,17 @@ public class PaginationService : IPaginationService
         _mapper = mapper;
     }
 
-    public IEnumerable<ArticlePreviewModel> GetArticlesByPagination(IEnumerable<Article> articles, PaginationDto? paginationDto)
+    public IEnumerable<Article> GetArticlesByPagination(IEnumerable<Article> articles, PaginationDto? paginationDto)
     {
-        if (paginationDto is null)
+        if (paginationDto is null || (paginationDto.Count == 0 && paginationDto.PageNumber == 0))
         {
-            return _mapper.ProjectTo<ArticlePreviewModel>(articles.AsQueryable());;
+            return articles;
         }
         var countArticles = paginationDto.Count;
         var pageNumber = paginationDto.PageNumber;
         if (!articles.Any() || articles.Count() <= countArticles)
         {
-            var previewModels = articles.Select(article => _mapper.Map<ArticlePreviewModel>(article));
-            return previewModels;
+            return articles;
         }
         if (articles.Count() < countArticles * pageNumber)
         {
@@ -34,10 +33,8 @@ public class PaginationService : IPaginationService
         }
         if (articles.Skip(countArticles * pageNumber).Count() < countArticles)
         {
-            articles = articles.Skip(countArticles * pageNumber - 1).ToArray();
-            return _mapper.ProjectTo<ArticlePreviewModel>(articles.AsQueryable());
+            return articles.Skip(countArticles * pageNumber - 1).ToArray();
         }
-        articles = articles.Skip(countArticles * pageNumber).Take(countArticles).ToArray();
-        return _mapper.ProjectTo<ArticlePreviewModel>(articles.AsQueryable());
+        return articles.Skip(countArticles * pageNumber).Take(countArticles).ToArray();
     }
 }

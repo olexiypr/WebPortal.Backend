@@ -7,6 +7,7 @@ using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.Article;
 using WebPortal.Application.Dtos.User;
 using WebPortal.Application.Exceptions;
+using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
 using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;

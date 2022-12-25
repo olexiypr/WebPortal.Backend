@@ -5,7 +5,7 @@ using WebPortal.Application.Models;
 
 namespace WebPortal.Application.Services.Interfaces;
 
-public interface IRegisterService
+public interface IAuthService
 {
     public Task<(string, UserModel)> RegisterUserAsync(RegisterUserDto registerUserDto);
     public Task<(string, UserModel)> LoginUserAsync(AuthDto authDto);

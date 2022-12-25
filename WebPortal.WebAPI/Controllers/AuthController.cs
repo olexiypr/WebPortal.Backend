@@ -10,15 +10,15 @@ namespace WebPortal.WebAPI.Controllers;
 [ApiController]
 public class AuthController : BaseController
 {
-    private readonly IRegisterService _registerService;
+    private readonly IAuthService _authService;
     private readonly IMapper _mapper;
-    public AuthController(IRegisterService registerService, IMapper mapper) => (_registerService, _mapper) = (registerService, mapper);
+    public AuthController(IAuthService authService, IMapper mapper) => (_authService, _mapper) = (authService, mapper);
     
     [HttpPost]
     [ActionName("login")]
     public async Task<IActionResult> Login(AuthDto authDto)
     {
-        var (token, user) = await _registerService.LoginUserAsync(authDto);
+        var (token, user) = await _authService.LoginUserAsync(authDto);
         var response = new
         {
             access_token = token,
@@ -30,7 +30,7 @@ public class AuthController : BaseController
     [ActionName("register")]
     public async Task<ActionResult> Register([FromForm]RegisterUserDto registerUserDto)
     {
-        var (token, user) = await _registerService.RegisterUserAsync(registerUserDto);
+        var (token, user) = await _authService.RegisterUserAsync(registerUserDto);
         var response = new
         {
             access_token = token,

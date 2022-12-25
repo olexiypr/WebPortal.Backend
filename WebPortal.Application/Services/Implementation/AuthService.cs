@@ -13,14 +13,14 @@ using WebPortal.Persistence.Infrastructure;
 
 namespace WebPortal.Application.Services.Implementation;
 
-public class RegisterService : IRegisterService
+public class AuthService : IAuthService
 {
     private readonly IMapper _mapper;
     private readonly IRepository<User> _userRepository;
     private readonly IIdentityService _identityService;
     private readonly IImageService _imageService;
     private readonly IWebHostEnvironment _environment;
-    public RegisterService(IMapper mapper, IRepository<User> userRepository, IIdentityService identityService, IWebHostEnvironment environment, IImageService imageService)
+    public AuthService(IMapper mapper, IRepository<User> userRepository, IIdentityService identityService, IWebHostEnvironment environment, IImageService imageService)
     {
         _environment = environment;
         _imageService = imageService;
@@ -29,6 +29,10 @@ public class RegisterService : IRegisterService
 
     public async Task<(string, UserModel)> RegisterUserAsync(RegisterUserDto registerUserDto)
     {
+        if (await IsRegisterUser(registerUserDto.Email))
+        {
+            throw new UserAccessDeniedExceptions(registerUserDto.Email);
+        }
         var user = _mapper.Map<User>(registerUserDto);
         user.RegistrationDate = DateTime.Now;
         user.Role = "user";
@@ -42,6 +46,13 @@ public class RegisterService : IRegisterService
         var authDto = _mapper.Map<AuthDto>(user);
         var token = await _identityService.GetToken(authDto);
         return (token, _mapper.Map<UserModel>(user));
+    }
+
+    private async Task<bool> IsRegisterUser(string email)
+    {
+        var user = await _userRepository.Query()
+            .FirstOrDefaultAsync(user => user.Email == email);
+        return user != null;
     }
     public async Task<(string, UserModel)> LoginUserAsync(AuthDto authDto)
     {

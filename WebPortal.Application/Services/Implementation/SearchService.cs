@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using WebPortal.Application.Exceptions;
+using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
 using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
