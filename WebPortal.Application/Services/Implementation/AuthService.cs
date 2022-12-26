@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using WebPortal.Application.Auth;
 using WebPortal.Application.Dtos.Auth;
 using WebPortal.Application.Dtos.User;
 using WebPortal.Application.Exceptions;
@@ -19,10 +20,8 @@ public class AuthService : IAuthService
     private readonly IRepository<User> _userRepository;
     private readonly IIdentityService _identityService;
     private readonly IImageService _imageService;
-    private readonly IWebHostEnvironment _environment;
-    public AuthService(IMapper mapper, IRepository<User> userRepository, IIdentityService identityService, IWebHostEnvironment environment, IImageService imageService)
+    public AuthService(IMapper mapper, IRepository<User> userRepository, IIdentityService identityService, IImageService imageService)
     {
-        _environment = environment;
         _imageService = imageService;
         (_mapper, _userRepository, _identityService) = (mapper, userRepository, identityService);
     }
@@ -31,11 +30,11 @@ public class AuthService : IAuthService
     {
         if (await IsRegisterUser(registerUserDto.Email))
         {
-            throw new UserAccessDeniedExceptions(registerUserDto.Email);
+            throw new UserAccessDeniedExceptions("User already registered!");
         }
         var user = _mapper.Map<User>(registerUserDto);
         user.RegistrationDate = DateTime.Now;
-        user.Role = "user";
+        user.Role = AuthOptions.UserRole;
         await _userRepository.AddAsync(user);
         
         if (registerUserDto.Avatar != null)

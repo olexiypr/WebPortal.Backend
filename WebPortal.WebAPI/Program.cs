@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using WebPortal.Application.Auth;
+using WebPortal.Application.Dtos.User;
+using WebPortal.Application.Validation;
 using WebPortal.Persistence.Context;
 using WebPortal.WebAPI.Middlewares;
 using WebPortal.WebAPI.ServiceExtension;
@@ -16,13 +18,14 @@ if (environment.IsProduction())
 {
     //add logging
 }
-builder.Services.InstallServicesInAssembly(configuration);
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMyAuthentication();
 builder.Services.AddMvc();
+builder.Services.InstallServicesInAssembly(configuration);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ApplyAll", policyBuilder =>

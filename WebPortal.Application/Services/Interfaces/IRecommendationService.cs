@@ -7,5 +7,4 @@ namespace WebPortal.Application.Services.Interfaces;
 public interface IRecommendationService
 {
     public Task<IEnumerable<ArticlePreviewModel>> GetRecommendation();
-    public Task<IEnumerable<ArticlePreviewModel>> GetPopularArticles();
 }

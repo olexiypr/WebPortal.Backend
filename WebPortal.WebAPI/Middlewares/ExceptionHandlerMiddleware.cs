@@ -42,6 +42,9 @@ public class ExceptionHandlerMiddleware
             case UserAccessDeniedExceptions userAccessDeniedExceptions:
                 code = HttpStatusCode.Forbidden;
                 break;
+            case ArgumentException argumentException:
+                code = HttpStatusCode.BadRequest;
+                break;
         }
 
         context.Response.ContentType = "application/json";

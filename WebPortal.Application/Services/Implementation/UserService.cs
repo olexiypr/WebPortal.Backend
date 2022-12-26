@@ -21,48 +21,33 @@ namespace WebPortal.Application.Services.Implementation;
 public class UserService : IUserService
 {
     private readonly IRepository<User> _userRepository;
-    private readonly IRepository<Recommendation> _recommendationRepository;
-    private readonly IRecommendationService _recommendationService;
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IImageService _imageService;
-    private readonly IRepository<Tag> _tagRepository;
-    private readonly IWebHostEnvironment _webHostEnvironment;
-    public UserService(IRepository<User> userRepository, IRecommendationService recommendationService, 
-        IRepository<Tag> tagRepository, IRepository<Recommendation> recommendationRepository,
-        IMapper mapper, IWebHostEnvironment webHostEnvironment, IHttpContextAccessor contextAccessor, IImageService imageService)
+    public UserService(IRepository<User> userRepository,
+        IMapper mapper, IHttpContextAccessor contextAccessor, IImageService imageService)
     {
         _contextAccessor = contextAccessor;
         _imageService = imageService;
-        (_userRepository, _recommendationService, _tagRepository, _recommendationRepository, _mapper,
-                _webHostEnvironment) =
-            (userRepository, recommendationService, tagRepository, recommendationRepository, mapper,
-                webHostEnvironment);
+        (_userRepository, _mapper) =
+            (userRepository, mapper);
     }
 
-    public async Task<UserModel> GetUserByIdAsync(Guid id)
+    public async Task<UserModel> GetCurrentUser()
     {
+        var id = _contextAccessor.HttpContext!.User.GetCurrentUserId();
         var user = await _userRepository.Query()
             .Include(user => user.Articles)
             .ThenInclude(article => article.Tags)
             .Include(user => user.Recommendation)
             .FirstOrDefaultAsync(u => u.Id == id);
-        if (_contextAccessor.HttpContext!.User.GetCurrentUserId() == id)
-        {
-            return _mapper.Map<UserModel>(user);
-        }
-        user!.Articles = (ICollection<Article>) user.Articles.Where(article => article.Status == ArticleStatuses.Published);
         return _mapper.Map<UserModel>(user);
-    }
-    
-    private string GetAvatarLink(Guid userId)
-    {
-        return "https://localhost:7150/api/Image/" + userId;
     }
     public async Task<UserModel> GetUserByNickName(string nickName)
     {
         var user = await _userRepository.Query()
-            .Include(user => user.Articles)
+            .Include(user => user.Articles
+                .Where(article => article.Status == ArticleStatuses.Published))
             .ThenInclude(article => article.Tags)
             .Include(user => user.Recommendation)
             .FirstOrDefaultAsync(u => u.NickName == nickName);
@@ -70,29 +55,26 @@ public class UserService : IUserService
         {
             throw new NotFoundException(nameof(User), nickName);
         }
-        /*if (user.Avatar!.Length > 0)
-        {
-            user.Avatar = GetAvatarLink(user.Id);
-        }*/
         var userModel = _mapper.Map<UserModel>(user);
         return userModel;
     }
     
     public async Task<UserModel> UpdateUserData(UpdateUserDataDto userDataDto)
     {
+        var userId = _contextAccessor.HttpContext!.User.GetCurrentUserId();
         var user = await _userRepository.Query()
-            .FirstOrDefaultAsync(user => user.NickName == userDataDto.NickName);
+            .FirstOrDefaultAsync(user => user.Id == userId);
         if (user == null)
         {
-            throw new NotFoundException(nameof(User), userDataDto.NickName);
+            throw new UserAccessDeniedExceptions(nameof(User));
         }
 
         if (userDataDto.ChangedNickName != null && 
-            !await _userRepository.Query().AnyAsync(user => user.NickName == userDataDto.ChangedNickName))
+            await _userRepository.Query().AnyAsync(user => user.NickName == userDataDto.ChangedNickName))
         {
-            user.NickName = userDataDto.ChangedNickName;
+            throw new ArgumentException("User with same nick name already registered!");
         }
-
+        user.NickName = userDataDto.ChangedNickName ?? user.NickName;
         user.Name = userDataDto.Name ?? user.Name;
         user.Description = userDataDto.Description ?? user.Description;
         await _userRepository.SaveChangesAsync();
@@ -101,7 +83,6 @@ public class UserService : IUserService
 
     public async Task<UserModel> UpdateUserPhoto(IFormFile avatar, string nickName)
     {
-        
         var user = await _userRepository.Query().FirstOrDefaultAsync(user => user.NickName == nickName);
         if (user == null)
         {

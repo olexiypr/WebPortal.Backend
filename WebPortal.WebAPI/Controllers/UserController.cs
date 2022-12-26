@@ -30,7 +30,7 @@ public class UserController : BaseController
     [Authorize]
     public async Task<ActionResult<UserModel>> GetUser()
     {
-        var user = await _userService.GetUserByIdAsync(HttpContext.User.GetCurrentUserId());
+        var user = await _userService.GetCurrentUser();
         return Ok(user);
     }
     [HttpPut]

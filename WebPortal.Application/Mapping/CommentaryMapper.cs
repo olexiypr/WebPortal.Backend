@@ -18,8 +18,6 @@ public class CommentaryMapper : Profile
         CreateMap<AddCommentaryDto, Commentary>()
             .ForMember(commentary => commentary.CreationDate,
                 opt => opt.MapFrom(dto => DateTime.Now))
-            .ForMember(commentary => commentary.AuthorId,
-                opt => opt.MapFrom(dto => dto.AuthorId))
             .ForMember(commentary => commentary.ArticleId,
                 opt => opt.MapFrom(dto => dto.ArticleId))
             .ForMember(commentary => commentary.Text,

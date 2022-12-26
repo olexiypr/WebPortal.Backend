@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql.PostgresTypes;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.Article;
+using WebPortal.Application.Dtos.Enums;
 using WebPortal.Application.Exceptions;
 using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
@@ -81,26 +82,31 @@ public class ArticleService : IArticleService
     }
     public async Task<IEnumerable<ArticlePreviewModel>> GetPopularArticles(string period, PaginationDto? paginationDto)
     {
-        var articles = period switch
+        paginationDto ??= new PaginationDto
         {
-            "day" => await _articleRepository.Query()
-                .Include(article => article.Tags)
-                .OrderByDescending(article => article.CountViewsPerDay)
-                .Take(10)
-                .ToListAsync(),
-            "week" => await _articleRepository.Query()
-                .Include(article => article.Tags)
-                .OrderByDescending(article => article.CountViewsPerWeek)
-                .Take(10)
-                .ToListAsync(),
-            "month" => await _articleRepository.Query()
-                .Include(article => article.Tags)
-                .OrderByDescending(article => article.CountViewsPerMonth)
-                .Take(10)
-                .ToListAsync(),
-            _ => throw new ArgumentException(nameof(period), period)
+            Count = 10,
+            PageNumber = 1
         };
-        return _mapper.ProjectTo<ArticlePreviewModel>(articles.AsQueryable());
+        var articles = await _articleRepository.Query()
+            .Include(article => article.Tags)
+            .Take(paginationDto.Count)
+            .ToListAsync();
+        switch (Enum.Parse<Periods>(period))
+        {
+            case Periods.Day:
+                articles = articles.OrderByDescending(article => article.CountViewsPerDay).ToList();
+                break;
+            case Periods.Week:
+                articles = articles.OrderByDescending(article => article.CountViewsPerWeek).ToList();
+                break;
+            case Periods.Month:
+                articles = articles.OrderByDescending(article => article.CountViewsPerMonth).ToList();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }    
+        return _mapper.ProjectTo<ArticlePreviewModel>
+            (_paginationService.GetArticlesByPagination(articles, paginationDto).AsQueryable());
     }
     
 

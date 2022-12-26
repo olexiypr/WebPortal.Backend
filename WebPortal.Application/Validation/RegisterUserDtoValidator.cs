@@ -12,11 +12,6 @@ public class RegisterUserDtoValidator : AbstractValidator<RegisterUserDto>
         RuleFor(dto => dto.Email).EmailAddress();
         RuleFor(dto => dto.Password).MinimumLength(8).MaximumLength(20);
         RuleFor(dto => dto.NickName).Must(s => s.StartsWith("@"));
-        RuleFor(dto => dto.Avatar).Must(ValidateImage).When(dto => dto.Avatar != null);
-    }
-
-    private bool ValidateImage(IFormFile avatar)
-    {
-        return true;
+        RuleFor(dto => dto.Avatar).Must(new ImageValidator().Validate).When(dto => dto.Avatar != null);
     }
 }

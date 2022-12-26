@@ -1,10 +1,13 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using WebPortal.Application.Dtos.Commentary;
+using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
 using WebPortal.Application.Models.Commentary;
 using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
+using WebPortal.Domain.User;
 using WebPortal.Persistence.Exceptions;
 using WebPortal.Persistence.Infrastructure;
 
@@ -15,12 +18,16 @@ public class CommentaryService : ICommentaryService
     private readonly IRepository<Commentary> _commentaryRepository;
     private readonly IRepository<Article> _articleRepository;
     private readonly IMapper _mapper;
+    private readonly IRepository<User> _userRepository;
+    private readonly IHttpContextAccessor _contextAccessor;
 
-    public CommentaryService(IRepository<Commentary> commentaryRepository, IMapper mapper, IRepository<Article> articleRepository)
+    public CommentaryService(IRepository<Commentary> commentaryRepository, IMapper mapper, IRepository<Article> articleRepository, IHttpContextAccessor contextAccessor, IRepository<User> userRepository)
     {
         _commentaryRepository = commentaryRepository;
         _mapper = mapper;
         _articleRepository = articleRepository;
+        _contextAccessor = contextAccessor;
+        _userRepository = userRepository;
     }
 
     public async Task<IEnumerable<CommentaryModel>> GetCommentariesByArticleIdAsync(Guid id) //need to work
@@ -36,6 +43,17 @@ public class CommentaryService : ICommentaryService
     
     public async Task<CommentaryModel> AddCommentaryToArticleAsync(AddCommentaryDto addCommentaryDto)
     {
+        var addedCommentary = _mapper.Map<Commentary>(addCommentaryDto);
+        var article = await _articleRepository.Query()
+            .Include(article => article.Commentaries)
+            .FirstOrDefaultAsync(article => article.Id == addCommentaryDto.ArticleId);
+        if (article == null)
+        {
+            throw new NotFoundException(nameof(Commentary), addCommentaryDto.ArticleId);
+        }
+        addedCommentary.Article = article;
+        var authorId = _contextAccessor.HttpContext!.User.GetCurrentUserId();
+        addedCommentary.Author = await _userRepository.GetByIdAsync(authorId);
         if (addCommentaryDto.ReplayToId != null)
         {
             var commentary = await _commentaryRepository.Query()
@@ -45,28 +63,12 @@ public class CommentaryService : ICommentaryService
             {
                 throw new NotFoundException(nameof(Commentary), addCommentaryDto.ReplayToId);
             }
-
-            var addedCommentary = _mapper.Map<Commentary>(addCommentaryDto);
             addedCommentary.Parent = commentary;
             commentary.Replies.Add(addedCommentary);
-            await _commentaryRepository.SaveChangesAsync();
-            return _mapper.Map<CommentaryModel>(addedCommentary);
         }
-        
-        var article = await _articleRepository.Query()
-            .Include(article => article.Commentaries)
-            .Include(article => article.Author)
-            .FirstOrDefaultAsync(article => article.Id == addCommentaryDto.ArticleId);
-        if (article == null)
-        {
-            throw new NotFoundException(nameof(Commentary), addCommentaryDto.ArticleId);
-        }
-
-        var comment = _mapper.Map<Commentary>(addCommentaryDto);
-        article.Commentaries.Add(comment);
-        await _articleRepository.SaveChangesAsync();
-        var commentaryModel = _mapper.Map<CommentaryModel>(comment);
-        commentaryModel.AuthorNickName = article.Author.NickName;
+        await _commentaryRepository.AddAsync(addedCommentary);
+        await _commentaryRepository.SaveChangesAsync();
+        var commentaryModel = _mapper.Map<CommentaryModel>(addedCommentary);
         return commentaryModel;
     }
 

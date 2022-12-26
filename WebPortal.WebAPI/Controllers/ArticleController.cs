@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.Article;
 using WebPortal.Application.Dtos.Complain;
+using WebPortal.Application.Dtos.Enums;
 using WebPortal.Application.Models.Article;
 using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain.Enums;
@@ -34,7 +35,7 @@ public class ArticleController : BaseController
     }
     [HttpGet]
     [ActionName("popular")]
-    public async Task<ActionResult<IEnumerable<ArticlePreviewModel>>> GetPopularArticles([FromQuery] string period, 
+    public async Task<ActionResult<IEnumerable<ArticlePreviewModel>>> GetPopularArticles([FromQuery] String period, 
         [FromQuery] PaginationDto? paginationDto)
     {
         var articles = await _articleService.GetPopularArticles(period, paginationDto);

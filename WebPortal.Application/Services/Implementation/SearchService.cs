@@ -26,16 +26,20 @@ public class SearchService : ISearchService
 
     public async Task<SearchModel> Search(string searchText)
     {
-        var id = _contextAccessor.HttpContext!.User.GetCurrentUserId();
-        var user = await _userRepository.Query()
-            .Include(user => user.Recommendation)
-            .FirstOrDefaultAsync(user => user.Id == id);
-        if (user == null)
+        try
         {
-            
+            var id = _contextAccessor.HttpContext!.User.GetCurrentUserId();
+            var user = await _userRepository.Query()
+                .Include(user => user.Recommendation)
+                .FirstAsync(user => user.Id == id);
+            user.Recommendation ??= new Recommendation();
+            user.Recommendation.FoundWords.AddRange(searchText.Split(" "));
+            await _userRepository.SaveChangesAsync();
         }
-        user.Recommendation ??= new Recommendation();
-        user.Recommendation.FoundWords.AddRange(searchText.Split(" "));
+        catch (UserAccessDeniedExceptions e)
+        {
+            Console.WriteLine(e);
+        }
         var articles = _articleRepository.Query().Select(a => a).ToList().Where(article =>
         {
             foreach (var s in searchText.Split(' '))

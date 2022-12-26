@@ -20,7 +20,8 @@ public class ArticleCategoryService : IArticleCategoryService
     public ArticleCategoryService(IRepository<ArticleCategory> articleCategoryRepository, IMapper mapper, IPaginationService paginationService)
     {
         _paginationService = paginationService;
-        (_articleCategoryRepository, _mapper) = (articleCategoryRepository, mapper);
+        _articleCategoryRepository = articleCategoryRepository;
+        _mapper =  mapper;
     }
 
     public async Task<IEnumerable<ArticleCategoryModel>> GetAllCategories()

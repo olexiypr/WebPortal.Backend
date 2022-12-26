@@ -50,4 +50,9 @@ public class ImageService : IImageService
             throw new IOException(nameof(avatar));
         }
     }
+
+    public void ValidateImage(IFormFile avatar)
+    {
+        
+    }
 }

@@ -10,7 +10,6 @@ public class MyCustomServicesInstaller : IInstaller
     {
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRecommendationService, RecommendationService>();
-        services.AddScoped<IFileService, FileService>();
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IAuthService, AuthService>();
