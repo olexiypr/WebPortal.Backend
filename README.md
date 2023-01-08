@@ -19,7 +19,7 @@ create articles, modify them, publish, delete, upload an avatar, change informat
 - REST API
 - Multi-layered architecture
 - PostgreSQL and EF 6
-- Authentication and authorization capabilities with IdentityServer, with JWT Bearer auth
+- Authentication and authorization capabilities with JWT Bearer auth
 - Data validation with FluentValidation
 - API documentation with Swagger and Swagger UI
 
