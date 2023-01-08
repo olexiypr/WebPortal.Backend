@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using WebPortal.Application.Dtos.Commentary;
 using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
@@ -20,24 +21,31 @@ public class CommentaryService : ICommentaryService
     private readonly IMapper _mapper;
     private readonly IRepository<User> _userRepository;
     private readonly IHttpContextAccessor _contextAccessor;
+    private readonly IMemoryCache _memoryCache;
 
-    public CommentaryService(IRepository<Commentary> commentaryRepository, IMapper mapper, IRepository<Article> articleRepository, IHttpContextAccessor contextAccessor, IRepository<User> userRepository)
+    public CommentaryService(IRepository<Commentary> commentaryRepository, IMapper mapper, IRepository<Article> articleRepository, IHttpContextAccessor contextAccessor, IRepository<User> userRepository, IMemoryCache memoryCache)
     {
         _commentaryRepository = commentaryRepository;
         _mapper = mapper;
         _articleRepository = articleRepository;
         _contextAccessor = contextAccessor;
         _userRepository = userRepository;
+        _memoryCache = memoryCache;
     }
 
     public async Task<IEnumerable<CommentaryModel>> GetCommentariesByArticleIdAsync(Guid id) //need to work
     {
-        var commentaries = await _commentaryRepository.Query()
+        if (_memoryCache.TryGetValue(id, out IEnumerable<Commentary> commentaries))
+            return CommentaryTreeMapper.MapToTree(commentaries);
+        commentaries = await _commentaryRepository.Query()
             .Include(commentary => commentary.Author)
             .Include(commentary => commentary.Replies)
             .ThenInclude(reply => reply.Replies)
             .Where(commentary => commentary.ArticleId == id)
             .ToListAsync();
+        var cacheEntryOptions = new MemoryCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromMinutes(20));
+        _memoryCache.Set(id, commentaries, cacheEntryOptions);
         return CommentaryTreeMapper.MapToTree(commentaries);
     }
     

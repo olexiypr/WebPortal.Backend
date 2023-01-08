@@ -2,7 +2,9 @@ using System.Diagnostics;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Npgsql.PostgresTypes;
+using Serilog;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.Article;
 using WebPortal.Application.Dtos.Enums;
@@ -23,18 +25,19 @@ public class ArticleService : IArticleService
 {
     private readonly IRepository<Article> _articleRepository;
     private readonly IRepository<User> _userRepository;
-    /*private readonly IRepository<Tag> _tagRepository;*/
+    private readonly IMemoryCache _memoryCache;
     private readonly IRepository<ArticleCategory> _categoryRepository;
     private readonly ITagService _tagService;
     private readonly IPaginationService _paginationService;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IMapper _mapper;
-
-    public ArticleService(IRepository<Article> articleRepository, IRepository<User> userRepository, IRepository<ArticleCategory> categoryRepository,IMapper mapper, IHttpContextAccessor contextAccessor, ITagService tagService, IPaginationService paginationService)
+    private const string PopularArticlesInCacheKey = "popular";
+    public ArticleService(IRepository<Article> articleRepository, IRepository<User> userRepository, IRepository<ArticleCategory> categoryRepository,IMapper mapper, IHttpContextAccessor contextAccessor, ITagService tagService, IPaginationService paginationService, IMemoryCache memoryCache)
     {
         _contextAccessor = contextAccessor;
         _tagService = tagService;
         _paginationService = paginationService;
+        _memoryCache = memoryCache;
         (_articleRepository, _userRepository, _categoryRepository, _mapper) = (articleRepository,
             userRepository, categoryRepository, mapper);
     }
@@ -55,7 +58,7 @@ public class ArticleService : IArticleService
         return _mapper.Map<ArticleModel>(article);
     }
 
-    public async Task<IEnumerable<UserArticlePreviewModel>> GetUserArticles(ArticleStatuses status, PaginationDto? paginationDto)
+    public async Task<IEnumerable<UserArticlePreviewModel>> GetUserArticlesAsync(ArticleStatuses status, PaginationDto? paginationDto)
     {
         var userId = _contextAccessor.HttpContext!.User.GetCurrentUserId();
         var articles = await _articleRepository.Query()
@@ -80,17 +83,23 @@ public class ArticleService : IArticleService
         article.CountViewsPerWeek++;
         article.CountViewsPerMonth++;
     }
-    public async Task<IEnumerable<ArticlePreviewModel>> GetPopularArticles(string period, PaginationDto? paginationDto)
+    public async Task<IEnumerable<ArticlePreviewModel>> GetPopularArticlesAsync(string period, PaginationDto? paginationDto)
     {
         paginationDto ??= new PaginationDto
         {
             Count = 10,
             PageNumber = 1
         };
-        var articles = await _articleRepository.Query()
-            .Include(article => article.Tags)
-            .Take(paginationDto.Count)
-            .ToListAsync();
+        if (!_memoryCache.TryGetValue(PopularArticlesInCacheKey, out IEnumerable<Article> articles))
+        {
+            articles = await _articleRepository.Query()
+                .Include(article => article.Tags)
+                .Take(paginationDto.Count)
+                .ToListAsync();
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(20));
+            _memoryCache.Set(PopularArticlesInCacheKey, articles, cacheEntryOptions);
+        }
         switch (Enum.Parse<Periods>(period))
         {
             case Periods.Day:
@@ -117,7 +126,7 @@ public class ArticleService : IArticleService
             .FirstOrDefaultAsync(articleCategory => articleCategory.Id == articleDto.CategoryId);
         if (category == null)
         {
-            throw new ArgumentException();
+            throw new NotFoundException(nameof(ArticleCategory), articleDto.CategoryId);
         }
         var userId = _contextAccessor.HttpContext!.User.GetCurrentUserId();
         article.KeyWords = GetKeyWords(article.Text, article.Name);
@@ -183,7 +192,7 @@ public class ArticleService : IArticleService
         return (article.CountLikes, article.Rating);
     }
 
-    public async Task<bool> DeleteArticle(Guid id)
+    public async Task<bool> DeleteArticleAsync(Guid id)
     {
         var article = await _articleRepository.GetByIdAsync(id);
         _articleRepository.Delete(article);

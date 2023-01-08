@@ -29,10 +29,10 @@ public class RecommendationService : IRecommendationService
         _userRepository = userRepository;
         _searchService = searchService;
         _articleService = articleService;
-        (_mapper) = (mapper);
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ArticlePreviewModel>> GetRecommendation() //need to work
+    public async Task<IEnumerable<ArticlePreviewModel>> GetRecommendation()
     {
         var userId = _contextAccessor.HttpContext!.User.GetCurrentUserId();
         var user = await _userRepository.Query()
@@ -40,7 +40,7 @@ public class RecommendationService : IRecommendationService
             .FirstAsync(user => user.Id == userId);
         user.Recommendation ??= new Recommendation();
         var searchModel = await _searchService.Search(string.Join(' ', user.Recommendation.FoundWords.ToArray()));
-        searchModel.Articles ??= await _articleService.GetPopularArticles(Periods.Week.ToString(), null);
+        searchModel.Articles ??= await _articleService.GetPopularArticlesAsync(Periods.Week.ToString(), null);
         var recommendationModel = 
             await _mapper.ProjectTo<ArticlePreviewModel>(searchModel.Articles.AsQueryable())
             .ToListAsync();

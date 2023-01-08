@@ -19,13 +19,15 @@ if (environment.IsProduction())
 {
     //add logging
 }
-builder.Logging.AddSerilog();
+//builder.Logging.AddSerilog();
 builder.Services.AddControllers();
 builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMyAuthentication();
 builder.Services.AddMvc();
 builder.Services.InstallServicesInAssembly(configuration);
+
+builder.Services.AddMemoryCache();
 
 builder.Services.AddCors(options =>
 {

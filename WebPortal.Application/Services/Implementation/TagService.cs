@@ -1,4 +1,3 @@
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Services.Interfaces;
@@ -10,12 +9,9 @@ namespace WebPortal.Application.Services.Implementation;
 public class TagService : ITagService
 {
     private readonly IRepository<Tag> _tagRepository;
-    private readonly IRepository<Article> _articleRepository;
-
-    public TagService(IRepository<Tag> tagRepository, IRepository<Article> articleRepository)
+    public TagService(IRepository<Tag> tagRepository)
     {
         _tagRepository = tagRepository;
-        _articleRepository = articleRepository;
     }
 
     public async Task AssignTagsToArticle(IEnumerable<TagDto>? tagDtos, Article article)

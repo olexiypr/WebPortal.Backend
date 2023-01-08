@@ -19,7 +19,7 @@ public class ArticleCategoryController : BaseController
     [HttpGet]
     public async Task<ActionResult> GetAllCategories()
     {
-        var categories = await _articleCategoryService.GetAllCategories();
+        var categories = await _articleCategoryService.GetAllCategoriesAsync();
         return Ok(categories);
     }
     

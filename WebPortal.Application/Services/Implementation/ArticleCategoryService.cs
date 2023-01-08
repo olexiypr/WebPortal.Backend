@@ -1,8 +1,13 @@
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Serilog;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.ArticleCategory;
+using WebPortal.Application.Exceptions;
 using WebPortal.Application.Models.Article;
 using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
@@ -17,16 +22,24 @@ public class ArticleCategoryService : IArticleCategoryService
     private readonly IRepository<ArticleCategory> _articleCategoryRepository;
     private readonly IPaginationService _paginationService;
     private readonly IMapper _mapper;
-    public ArticleCategoryService(IRepository<ArticleCategory> articleCategoryRepository, IMapper mapper, IPaginationService paginationService)
+    private readonly IMemoryCache _memoryCache;
+    private const string AllCategoriesInCacheKey = "categories";
+    public ArticleCategoryService(IRepository<ArticleCategory> articleCategoryRepository, IMapper mapper, IPaginationService paginationService, IMemoryCache memoryCache)
     {
         _paginationService = paginationService;
+        _memoryCache = memoryCache;
         _articleCategoryRepository = articleCategoryRepository;
         _mapper =  mapper;
     }
 
-    public async Task<IEnumerable<ArticleCategoryModel>> GetAllCategories()
+    public async Task<IEnumerable<ArticleCategoryModel>> GetAllCategoriesAsync()
     {
-        var categories = await _articleCategoryRepository.Query().ToListAsync();
+        if (_memoryCache.TryGetValue(AllCategoriesInCacheKey, out IEnumerable<ArticleCategory> categories))
+            return _mapper.ProjectTo<ArticleCategoryModel>(categories!.AsQueryable());
+        categories = await _articleCategoryRepository.Query().ToListAsync();
+        var cacheEntryOptions = new MemoryCacheEntryOptions()
+            .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+        _memoryCache.Set(AllCategoriesInCacheKey, categories, cacheEntryOptions);
         return _mapper.ProjectTo<ArticleCategoryModel>(categories.AsQueryable());
     }
     

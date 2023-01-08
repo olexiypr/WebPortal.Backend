@@ -6,7 +6,7 @@ namespace WebPortal.Application.Services.Interfaces;
 
 public interface IArticleCategoryService
 {
-    public Task<IEnumerable<ArticleCategoryModel>> GetAllCategories();
+    public Task<IEnumerable<ArticleCategoryModel>> GetAllCategoriesAsync();
     public Task<ArticleCategoryModel> GetArticlesInCategory(Guid categoryId, PaginationDto paginationDto);
     public Task<ArticleCategoryModel> CreateArticleCategory(CreateArticleCategoryDto createArticleCategoryDto);
 }

@@ -30,7 +30,7 @@ public class ArticleController : BaseController
     public async Task<ActionResult<IEnumerable<UserArticlePreviewModel>>> GetUserArticles([FromQuery] ArticleStatuses status, 
         [FromQuery] PaginationDto? paginationDto)
     {
-        var articles = await _articleService.GetUserArticles(status, paginationDto);
+        var articles = await _articleService.GetUserArticlesAsync(status, paginationDto);
         return Ok(articles);
     }
     [HttpGet]
@@ -38,7 +38,7 @@ public class ArticleController : BaseController
     public async Task<ActionResult<IEnumerable<ArticlePreviewModel>>> GetPopularArticles([FromQuery] String period, 
         [FromQuery] PaginationDto? paginationDto)
     {
-        var articles = await _articleService.GetPopularArticles(period, paginationDto);
+        var articles = await _articleService.GetPopularArticlesAsync(period, paginationDto);
         return Ok(articles);
     }
     [HttpPost]
@@ -74,7 +74,7 @@ public class ArticleController : BaseController
     [Authorize]
     public async Task<ActionResult> DeleteArticle(Guid id)
     {
-        var isSuccess = await _articleService.DeleteArticle(id);
+        var isSuccess = await _articleService.DeleteArticleAsync(id);
         return Ok(isSuccess);
     }
     /*[HttpPut]

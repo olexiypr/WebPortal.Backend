@@ -1,16 +1,13 @@
-using System.Collections;
 using AutoMapper;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using WebPortal.Application.Dtos;
-using WebPortal.Application.Dtos.Article;
+using Microsoft.Extensions.Caching.Memory;
+using Serilog;
 using WebPortal.Application.Dtos.User;
 using WebPortal.Application.Exceptions;
 using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
 using WebPortal.Application.Services.Interfaces;
-using WebPortal.Domain;
 using WebPortal.Domain.Enums;
 using WebPortal.Domain.User;
 using WebPortal.Persistence.Exceptions;
@@ -24,11 +21,13 @@ public class UserService : IUserService
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IImageService _imageService;
+    private readonly IMemoryCache _memoryCache;
     public UserService(IRepository<User> userRepository,
-        IMapper mapper, IHttpContextAccessor contextAccessor, IImageService imageService)
+        IMapper mapper, IHttpContextAccessor contextAccessor, IImageService imageService, IMemoryCache memoryCache)
     {
         _contextAccessor = contextAccessor;
         _imageService = imageService;
+        _memoryCache = memoryCache;
         (_userRepository, _mapper) =
             (userRepository, mapper);
     }
@@ -36,16 +35,24 @@ public class UserService : IUserService
     public async Task<UserModel> GetCurrentUser()
     {
         var id = _contextAccessor.HttpContext!.User.GetCurrentUserId();
-        var user = await _userRepository.Query()
+        if (_memoryCache.TryGetValue(id, out User user)) return _mapper.Map<UserModel>(user);
+        user = await _userRepository.Query()
             .Include(user => user.Articles)
             .ThenInclude(article => article.Tags)
             .Include(user => user.Recommendation)
             .FirstOrDefaultAsync(u => u.Id == id);
+        var cacheEntryOptions = new MemoryCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromMinutes(3));
+        _memoryCache.Set(id, user, cacheEntryOptions);
         return _mapper.Map<UserModel>(user);
     }
     public async Task<UserModel> GetUserByNickName(string nickName)
     {
-        var user = await _userRepository.Query()
+        if (!_memoryCache.TryGetValue(nickName, out User user))
+        {
+            return _mapper.Map<UserModel>(user);
+        }
+        user = await _userRepository.Query()
             .Include(user => user.Articles
                 .Where(article => article.Status == ArticleStatuses.Published))
             .ThenInclude(article => article.Tags)
@@ -55,20 +62,17 @@ public class UserService : IUserService
         {
             throw new NotFoundException(nameof(User), nickName);
         }
-        var userModel = _mapper.Map<UserModel>(user);
-        return userModel;
+        var cacheEntryOptions = new MemoryCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromMinutes(3));
+        _memoryCache.Set(nickName, user, cacheEntryOptions);
+        return _mapper.Map<UserModel>(user);
     }
-    
     public async Task<UserModel> UpdateUserData(UpdateUserDataDto userDataDto)
     {
         var userId = _contextAccessor.HttpContext!.User.GetCurrentUserId();
-        var user = await _userRepository.Query()
-            .FirstOrDefaultAsync(user => user.Id == userId);
-        if (user == null)
-        {
-            throw new UserAccessDeniedExceptions(nameof(User));
-        }
-
+        var user = await _userRepository.GetByIdAsync(userId);
+        _memoryCache.Remove(userId);
+        _memoryCache.Remove(user.NickName);
         if (userDataDto.ChangedNickName != null && 
             await _userRepository.Query().AnyAsync(user => user.NickName == userDataDto.ChangedNickName))
         {
@@ -88,7 +92,8 @@ public class UserService : IUserService
         {
             throw new NotFoundException(nameof(User), nickName);
         }
-
+        _memoryCache.Remove(user.Id);
+        _memoryCache.Remove(user.NickName);
         await _imageService.SetAvatar(user, avatar);
         await _userRepository.SaveChangesAsync();
         return _mapper.Map<UserModel>(user);
