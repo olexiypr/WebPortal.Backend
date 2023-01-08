@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using WebPortal.Application.Auth;
 using WebPortal.Application.Dtos.User;
 using WebPortal.Application.Validation;
@@ -18,8 +19,8 @@ if (environment.IsProduction())
 {
     //add logging
 }
+builder.Logging.AddSerilog();
 builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMyAuthentication();
@@ -61,7 +62,7 @@ var serviceProvider = scope.ServiceProvider;
 var context = serviceProvider.GetRequiredService<WebPortalDbContext>();
 try
 {
-    context.Database.EnsureCreated();
+    await context.Database.MigrateAsync();
 }
 catch (Exception e)
 {

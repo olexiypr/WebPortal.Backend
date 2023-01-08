@@ -45,7 +45,7 @@ public class IdentityService : IIdentityService
             audience: AuthOptions.AUDIENCE,
             notBefore: now,
             claims: claims,
-            expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+            expires: now.Add(TimeSpan.FromHours(AuthOptions.LIFETIME)),
             signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
         return encodedJwt;
