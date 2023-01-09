@@ -1,13 +1,5 @@
-using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.HttpOverrides;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.IdentityModel.Tokens;
-using Serilog;
-using WebPortal.Application.Auth;
-using WebPortal.Application.Dtos.User;
-using WebPortal.Application.Validation;
 using WebPortal.Persistence.Context;
 using WebPortal.WebAPI.Middlewares;
 using WebPortal.WebAPI.ServiceExtension;
@@ -26,7 +18,6 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddMyAuthentication();
 builder.Services.AddMvc();
 builder.Services.InstallServicesInAssembly(configuration);
-
 builder.Services.AddMemoryCache();
 
 builder.Services.AddCors(options =>
@@ -53,6 +44,7 @@ app.UseRouting();
 app.UseCors("ApplyAll");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseHangfireDashboard("/hangfire");
 /*app.UseMvc();*/
 app.UseEndpoints(endpoints =>
 {
@@ -61,6 +53,8 @@ app.UseEndpoints(endpoints =>
 
 using var scope = app.Services.CreateScope();
 var serviceProvider = scope.ServiceProvider;
+var recurringJobManager = serviceProvider.GetService<IRecurringJobManager>();
+serviceProvider.AddArticleViewerCleaner(recurringJobManager);
 var context = serviceProvider.GetRequiredService<WebPortalDbContext>();
 try
 {

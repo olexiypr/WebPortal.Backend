@@ -15,4 +15,7 @@ public interface IArticleService
     public Task<ArticleModel> UpdateArticleDataAsync(UpdateArticleDataDto updateArticleDataDto);
     public Task<(int, double)> UpdateArticleAnalyticsAsync(UpdateArticleAnalyticsDto updateArticleAnalyticsDto);
     public Task<bool> DeleteArticleAsync(Guid id);
+    public Task ClearViewsPerDayAsync();
+    public Task ClearViewsPerWeekAsync();
+    public Task ClearViewsPerMonthAsync();
 }

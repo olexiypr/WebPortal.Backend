@@ -199,7 +199,6 @@ public class ArticleService : IArticleService
         await _articleRepository.SaveChangesAsync();
         return true;
     }
-
     private List<string> GetKeyWords(string text, string articleName)
     {
         var keyWords = new List<string>(articleName.Split(" "));
@@ -213,5 +212,25 @@ public class ArticleService : IArticleService
             keyWords.Add(textArr.Select(g => g.Word).ToArray()[i]);
         }
         return keyWords;
+    }
+    public async Task ClearViewsPerDayAsync()
+    {
+        await _articleRepository.Query()
+            .ForEachAsync(article => article.CountViewsPerDay = 0);
+        await _articleRepository.SaveChangesAsync();
+    }
+
+    public async Task ClearViewsPerWeekAsync()
+    {
+        await _articleRepository.Query()
+            .ForEachAsync(article => article.CountViewsPerWeek = 0);
+        await _articleRepository.SaveChangesAsync();
+    }
+
+    public async Task ClearViewsPerMonthAsync()
+    {
+        await _articleRepository.Query()
+            .ForEachAsync(article => article.CountViewsPerMonth = 0);
+        await _articleRepository.SaveChangesAsync();
     }
 }
