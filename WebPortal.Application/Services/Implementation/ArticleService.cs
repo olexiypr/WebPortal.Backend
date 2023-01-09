@@ -1,10 +1,7 @@
-using System.Diagnostics;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Npgsql.PostgresTypes;
-using Serilog;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.Article;
 using WebPortal.Application.Dtos.Enums;
@@ -70,8 +67,8 @@ public class ArticleService : IArticleService
             return Array.Empty<UserArticlePreviewModel>();
         }
         var articlePreviews = _mapper
-            .ProjectTo<UserArticlePreviewModel>
-                (_paginationService.GetArticlesByPagination(articles, paginationDto).AsQueryable())
+            .Map<IEnumerable<UserArticlePreviewModel>>
+                (_paginationService.GetArticlesByPagination(articles, paginationDto))
             .ToList();
         return articlePreviews;
     }
@@ -97,7 +94,7 @@ public class ArticleService : IArticleService
                 .Take(paginationDto.Count)
                 .ToListAsync();
             var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromMinutes(20));
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(20));
             _memoryCache.Set(PopularArticlesInCacheKey, articles, cacheEntryOptions);
         }
         switch (Enum.Parse<Periods>(period))

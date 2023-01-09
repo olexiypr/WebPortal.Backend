@@ -19,7 +19,6 @@ builder.Services.AddMyAuthentication();
 builder.Services.AddMvc();
 builder.Services.InstallServicesInAssembly(configuration);
 builder.Services.AddMemoryCache();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ApplyAll", policyBuilder =>
