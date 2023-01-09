@@ -26,7 +26,7 @@ create articles, modify them, publish, delete, upload an avatar, change informat
 Features:
 - [x] Memory caching
 - [x] Logging
-- [ ] Add native background service to clear the number of article views per day, week 
+- [ ] Add hang fire to clear the number of article views per day, week 
 - [ ] Live chat with SignalR
 - [ ] Сonfirmation registration and password recovery by email
 - [ ] Unit tests
