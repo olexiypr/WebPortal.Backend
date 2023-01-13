@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebPortal.Tests", "WebPorta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPortal.UnitTests", "WebPortal.UnitTests\WebPortal.UnitTests.csproj", "{BF23D46B-8950-4463-8E73-9EC5BB422C9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPortal.Services", "WebPortal.DAL\WebPortal.Services\WebPortal.Services.csproj", "{63A5A94E-FDD2-4068-9F14-C0251F9FAF92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,7 @@ Global
 		{56D7C7DA-F330-4635-A5DC-70A410C4FF20} = {0BEB2809-30A8-4F94-A6F1-4473E77A59AC}
 		{B10E4FC9-2D2F-4B09-9285-E4421B57AC17} = {CCE86DD8-2AE4-4947-9595-C5CFF20F9C14}
 		{BF23D46B-8950-4463-8E73-9EC5BB422C9B} = {56514C1C-AADC-4A18-8B7B-7856D6870DD7}
+		{63A5A94E-FDD2-4068-9F14-C0251F9FAF92} = {CCE86DD8-2AE4-4947-9595-C5CFF20F9C14}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{12D1C36F-DBC8-4149-ADAD-6D0D3A86749F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -51,5 +54,9 @@ Global
 		{BF23D46B-8950-4463-8E73-9EC5BB422C9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF23D46B-8950-4463-8E73-9EC5BB422C9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF23D46B-8950-4463-8E73-9EC5BB422C9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63A5A94E-FDD2-4068-9F14-C0251F9FAF92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63A5A94E-FDD2-4068-9F14-C0251F9FAF92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63A5A94E-FDD2-4068-9F14-C0251F9FAF92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63A5A94E-FDD2-4068-9F14-C0251F9FAF92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

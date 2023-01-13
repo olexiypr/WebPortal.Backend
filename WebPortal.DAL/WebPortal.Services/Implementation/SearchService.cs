@@ -1,15 +1,15 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Services.Interfaces;
 using WebPortal.Application.Exceptions;
 using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
 using WebPortal.Domain.User;
 using WebPortal.Persistence.Infrastructure;
 
-namespace WebPortal.Application.Services.Implementation;
+namespace Services.Implementation;
 
 public class SearchService : ISearchService
 {

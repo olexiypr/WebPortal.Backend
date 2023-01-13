@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Interfaces;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.ArticleCategory;
-using WebPortal.Application.Models.Article;
-using WebPortal.Application.Services.Interfaces;
-using WebPortal.Domain;
 
 namespace WebPortal.WebAPI.Controllers;
 [Route("api/[controller]")]

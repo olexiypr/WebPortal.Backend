@@ -1,19 +1,15 @@
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Services.Interfaces;
 using WebPortal.Application.Dtos.Enums;
-using WebPortal.Application.Dtos.User;
-using WebPortal.Application.Exceptions;
 using WebPortal.Application.Extensions;
-using WebPortal.Application.Models;
 using WebPortal.Application.Models.Article;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
 using WebPortal.Domain.User;
 using WebPortal.Persistence.Infrastructure;
 
-namespace WebPortal.Application.Services.Implementation;
+namespace Services.Implementation;
 
 public class RecommendationService : IRecommendationService
 {
@@ -40,7 +36,7 @@ public class RecommendationService : IRecommendationService
             .FirstAsync(user => user.Id == userId);
         user.Recommendation ??= new Recommendation();
         var searchModel = await _searchService.Search(string.Join(' ', user.Recommendation.FoundWords.ToArray()));
-        searchModel.Articles ??= await _articleService.GetPopularArticlesAsync(Periods.Week.ToString(), null);
+        searchModel.Articles ??= await _articleService.GetPopularArticlesAsync(Periods.week.ToString(), null);
         var recommendationModel = 
             await _mapper.ProjectTo<ArticlePreviewModel>(searchModel.Articles.AsQueryable())
             .ToListAsync();

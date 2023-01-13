@@ -2,18 +2,16 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Serilog;
+using Services.Interfaces;
 using WebPortal.Application.Dtos.User;
-using WebPortal.Application.Exceptions;
 using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain.Enums;
 using WebPortal.Domain.User;
 using WebPortal.Persistence.Exceptions;
 using WebPortal.Persistence.Infrastructure;
 
-namespace WebPortal.Application.Services.Implementation;
+namespace Services.Implementation;
 
 public class UserService : IUserService
 {

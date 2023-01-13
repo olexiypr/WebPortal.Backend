@@ -1,8 +1,7 @@
 using WebPortal.Application.Dtos.Commentary;
-using WebPortal.Application.Models;
 using WebPortal.Application.Models.Commentary;
 
-namespace WebPortal.Application.Services.Interfaces;
+namespace Services.Interfaces;
 
 public interface ICommentaryService
 {

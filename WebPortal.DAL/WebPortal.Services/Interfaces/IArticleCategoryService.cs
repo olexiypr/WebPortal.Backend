@@ -2,7 +2,7 @@ using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.ArticleCategory;
 using WebPortal.Application.Models.Article;
 
-namespace WebPortal.Application.Services.Interfaces;
+namespace Services.Interfaces;
 
 public interface IArticleCategoryService
 {

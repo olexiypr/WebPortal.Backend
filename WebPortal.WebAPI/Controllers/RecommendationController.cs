@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Interfaces;
 using WebPortal.Application.Models;
 using WebPortal.Application.Models.Article;
-using WebPortal.Application.Services.Interfaces;
 
 namespace WebPortal.WebAPI.Controllers;
 

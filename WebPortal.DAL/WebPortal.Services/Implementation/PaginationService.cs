@@ -1,10 +1,9 @@
 using AutoMapper;
+using Services.Interfaces;
 using WebPortal.Application.Dtos;
-using WebPortal.Application.Models.Article;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
 
-namespace WebPortal.Application.Services.Implementation;
+namespace Services.Implementation;
 
 public class PaginationService : IPaginationService
 {

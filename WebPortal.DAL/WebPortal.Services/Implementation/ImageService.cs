@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using WebPortal.Application.Services.Interfaces;
+using Services.Interfaces;
 using WebPortal.Domain.User;
 using WebPortal.Persistence.Infrastructure;
 
-namespace WebPortal.Application.Services.Implementation;
+namespace Services.Implementation;
 
 public class ImageService : IImageService
 {

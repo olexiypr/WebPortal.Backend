@@ -3,8 +3,7 @@ using WebPortal.Application.Dtos.Article;
 using WebPortal.Application.Models.Article;
 using WebPortal.Domain.Enums;
 
-
-namespace WebPortal.Application.Services.Interfaces;
+namespace Services.Interfaces;
 
 public interface IArticleService
 {

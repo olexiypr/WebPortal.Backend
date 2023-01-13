@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using MockQueryable.Moq;
+using Services.Implementation;
+using Services.Interfaces;
+using Services.Interfaces.Cache;
 using WebPortal.Application.Dtos.Article;
-using WebPortal.Application.Dtos.Enums;
 using WebPortal.Application.Models.Article;
-using WebPortal.Application.Services.Implementation;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
 using WebPortal.Domain.Enums;
 using WebPortal.Domain.User;
@@ -32,8 +32,10 @@ public class ArticleServiceTest : BaseTest
     private readonly Mock<ITagService> _tagService;
     private readonly Mock<IPaginationService> _paginationService;
     private readonly Mock<IHttpContextAccessor> _contextAccessor;
+    private readonly Mock<ICacheService> _cacheService;
     public ArticleServiceTest()
     {
+        _cacheService = new Mock<ICacheService>();
         _articleRepository = new Mock<IRepository<Article>>();
         _userRepository = new Mock<IRepository<User>>();
         _memoryCache = new Mock<IMemoryCache>();
@@ -49,7 +51,7 @@ public class ArticleServiceTest : BaseTest
             _contextAccessor.Object,
             _tagService.Object,
             _paginationService.Object,
-            _memoryCache.Object);
+            _cacheService.Object);
         
     }
     [Theory, AutoEntityData]
@@ -135,5 +137,51 @@ public class ArticleServiceTest : BaseTest
 
         var actual = await _articleService.CreateArticleAsync(createArticleDto);
         actual.Should().BeEquivalentTo(expected, options => options.Excluding(model => model.CreationDate).ExcludingFields());
+    }
+    [Theory, AutoEntityData]
+    public async Task CreateArticleAsync_WhenArticleDtoInvalid_ThrowsException(User user, IEnumerable<ArticleCategory> category)
+    {
+        var createArticleDto = Fixture.Build<CreateArticleDto>()
+            .With(dto => dto.CategoryId, category.First().Id)
+            .With(dto => dto.Status, ArticleStatuses.Published)
+            .With(dto => dto.Text, string.Empty)
+            .Create();
+        var claims = new List<Claim>() {new (ClaimTypes.NameIdentifier, user.Id.ToString())};
+        var article = Mapper.Map<Article>(createArticleDto);
+        var expected = Mapper.Map<ArticleModel>(article);
+        expected.AuthorNickName = user.NickName;
+        _contextAccessor.Setup(accessor => accessor.HttpContext.User.Claims)
+            .Returns(claims);
+        _categoryRepository.Setup(categoryRepository => categoryRepository.Query())
+            .Returns(category.AsQueryable().BuildMock());
+        _userRepository.Setup(userRepository => userRepository.GetByIdAsync(user.Id))
+            .ReturnsAsync(user);
+        _articleRepository.Setup(repository => repository.AddAsync(It.IsAny<Article>()))
+            .ReturnsAsync(article);
+
+        var actual = await _articleService.CreateArticleAsync(createArticleDto);
+        
+        actual.Should().BeEquivalentTo(expected, options => options.Excluding(model => model.CreationDate).ExcludingFields());
+    }
+
+    [Theory, AutoEntityData]
+    public async Task UpdateArticleAsync_WhenUpdateArticleDto_IsValid_ReturnsArticle
+        (IEnumerable<Article> articles, Article article)
+    {
+        articles = articles.Append(article);
+        var updateArticleDataDto = Fixture.Build<UpdateArticleDataDto>()
+            .With(dto => dto.Id, article.Id)
+            .Create();
+        var expected = Fixture.Build<Article>()
+            .With(article => article.Id, article.Id)
+            .With(article => article.Name, updateArticleDataDto.Name)
+            .With(article => article.Text, updateArticleDataDto.Text)
+            .Create();
+        
+        var claims = new List<Claim>() {new (ClaimTypes.NameIdentifier, article.AuthorId.ToString())};
+        _articleRepository.Setup(repository => repository.Query())
+            .Returns(articles.AsQueryable().BuildMock());
+        var actual = await _articleService.UpdateArticleDataAsync(updateArticleDataDto);
+        
     }
 }

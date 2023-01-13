@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using WebPortal.Application.Dtos.User;
-using WebPortal.Application.Models;
 using WebPortal.Domain.User;
 
-namespace WebPortal.Application.Services.Interfaces;
+namespace Services.Interfaces;
 
 public interface IImageService
 {

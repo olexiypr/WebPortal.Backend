@@ -1,6 +1,7 @@
-using WebPortal.Application.Services;
-using WebPortal.Application.Services.Implementation;
-using WebPortal.Application.Services.Interfaces;
+using Services.Implementation;
+using Services.Implementation.Identity;
+using Services.Interfaces;
+using Services.Interfaces.Identity;
 
 namespace WebPortal.WebAPI.ServiceExtension;
 
@@ -9,6 +10,7 @@ public class MyCustomServicesInstaller : IInstaller
     public void InstallServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IHashService, HashService>();
         services.AddScoped<IRecommendationService, RecommendationService>();
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IIdentityService, IdentityService>();

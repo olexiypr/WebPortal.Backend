@@ -1,6 +1,6 @@
 using WebPortal.Application.Dtos.Auth;
 
-namespace WebPortal.Application.Services.Interfaces;
+namespace Services.Interfaces.Identity;
 
 public interface IIdentityService
 {

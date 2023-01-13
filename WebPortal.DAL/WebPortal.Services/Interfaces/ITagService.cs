@@ -1,7 +1,7 @@
 using WebPortal.Application.Dtos;
 using WebPortal.Domain;
 
-namespace WebPortal.Application.Services.Interfaces;
+namespace Services.Interfaces;
 
 public interface ITagService
 {

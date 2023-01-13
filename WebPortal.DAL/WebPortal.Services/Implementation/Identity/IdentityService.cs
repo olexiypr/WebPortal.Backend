@@ -1,26 +1,27 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text.RegularExpressions;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Services.Interfaces.Identity;
 using WebPortal.Application.Auth;
 using WebPortal.Application.Dtos.Auth;
-using WebPortal.Application.Exceptions;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain.User;
 using WebPortal.Persistence.Exceptions;
 using WebPortal.Persistence.Infrastructure;
 
-namespace WebPortal.Application.Services.Implementation;
+namespace Services.Implementation.Identity;
 
 public class IdentityService : IIdentityService
 {
     private readonly IRepository<UserAuth> _userRepository;
+    private readonly IHashService _hashService;
 
-    public IdentityService(IRepository<UserAuth> userRepository) =>
+    public IdentityService(IRepository<UserAuth> userRepository, IHashService hashService)
+    {
         (_userRepository) = (userRepository);
-    
+        _hashService = hashService;
+    }
+
     public async Task<string> GetToken(AuthDto authDto)
     {
         var user = await _userRepository.Query().FirstOrDefaultAsync(auth => auth.Email == authDto.Email);
@@ -29,10 +30,7 @@ public class IdentityService : IIdentityService
             throw new NotFoundException(nameof(User), authDto);
         }
 
-        if (user.Password != authDto.Password)
-        {
-            throw new UserAccessDeniedExceptions($"Email: {authDto.Email}, password: {authDto.Password}");
-        }
+        //_hashService.VerifyPassword(authDto.Password, user.Password);
         var claims = new List<Claim>
         {
             new (ClaimTypes.NameIdentifier, user.Id.ToString()),

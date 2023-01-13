@@ -1,21 +1,16 @@
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Serilog;
+using Services.Interfaces;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.ArticleCategory;
-using WebPortal.Application.Exceptions;
 using WebPortal.Application.Models.Article;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
 using WebPortal.Domain.Enums;
 using WebPortal.Persistence.Exceptions;
 using WebPortal.Persistence.Infrastructure;
 
-namespace WebPortal.Application.Services.Implementation;
+namespace Services.Implementation;
 
 public class ArticleCategoryService : IArticleCategoryService
 {

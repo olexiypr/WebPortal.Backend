@@ -2,6 +2,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Services.Interfaces;
+using Services.Interfaces.Cache;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.Article;
 using WebPortal.Application.Dtos.Enums;
@@ -9,32 +11,30 @@ using WebPortal.Application.Exceptions;
 using WebPortal.Application.Extensions;
 using WebPortal.Application.Models;
 using WebPortal.Application.Models.Article;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
 using WebPortal.Domain.Enums;
 using WebPortal.Domain.User;
 using WebPortal.Persistence.Exceptions;
 using WebPortal.Persistence.Infrastructure;
 
-namespace WebPortal.Application.Services.Implementation;
+namespace Services.Implementation;
 
 public class ArticleService : IArticleService
 {
     private readonly IRepository<Article> _articleRepository;
     private readonly IRepository<User> _userRepository;
-    private readonly IMemoryCache _memoryCache;
     private readonly IRepository<ArticleCategory> _categoryRepository;
     private readonly ITagService _tagService;
     private readonly IPaginationService _paginationService;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IMapper _mapper;
-    private const string PopularArticlesInCacheKey = "popular";
-    public ArticleService(IRepository<Article> articleRepository, IRepository<User> userRepository, IRepository<ArticleCategory> categoryRepository,IMapper mapper, IHttpContextAccessor contextAccessor, ITagService tagService, IPaginationService paginationService, IMemoryCache memoryCache)
+    private readonly ICacheService _cacheService;
+    public ArticleService(IRepository<Article> articleRepository, IRepository<User> userRepository, IRepository<ArticleCategory> categoryRepository,IMapper mapper, IHttpContextAccessor contextAccessor, ITagService tagService, IPaginationService paginationService, ICacheService cacheService)
     {
         _contextAccessor = contextAccessor;
         _tagService = tagService;
         _paginationService = paginationService;
-        _memoryCache = memoryCache;
+        _cacheService = cacheService;
         (_articleRepository, _userRepository, _categoryRepository, _mapper) = (articleRepository,
             userRepository, categoryRepository, mapper);
     }
@@ -87,25 +87,16 @@ public class ArticleService : IArticleService
             Count = 10,
             PageNumber = 1
         };
-        if (!_memoryCache.TryGetValue(PopularArticlesInCacheKey, out IEnumerable<Article> articles))
-        {
-            articles = await _articleRepository.Query()
-                .Include(article => article.Tags)
-                .Take(paginationDto.Count)
-                .ToListAsync();
-            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(20));
-            _memoryCache.Set(PopularArticlesInCacheKey, articles, cacheEntryOptions);
-        }
+        var articles = await _cacheService.GetArticlesFromCache(paginationDto);
         switch (Enum.Parse<Periods>(period))
         {
-            case Periods.Day:
+            case Periods.day:
                 articles = articles.OrderByDescending(article => article.CountViewsPerDay).ToList();
                 break;
-            case Periods.Week:
+            case Periods.week:
                 articles = articles.OrderByDescending(article => article.CountViewsPerWeek).ToList();
                 break;
-            case Periods.Month:
+            case Periods.month:
                 articles = articles.OrderByDescending(article => article.CountViewsPerMonth).ToList();
                 break;
             default:
@@ -114,8 +105,6 @@ public class ArticleService : IArticleService
         return _mapper.ProjectTo<ArticlePreviewModel>
             (_paginationService.GetArticlesByPagination(articles, paginationDto).AsQueryable());
     }
-    
-
     public async Task<ArticleModel> CreateArticleAsync(CreateArticleDto articleDto)
     {
         var article = _mapper.Map<Article>(articleDto);
@@ -137,10 +126,19 @@ public class ArticleService : IArticleService
 
     public async Task<ArticleModel> UpdateArticleDataAsync(UpdateArticleDataDto updateArticleDataDto)
     {
-        var article = await _articleRepository.Query().
-            Include(article => article.Author)
+        var article = await _articleRepository.Query()
+            .Include(article => article.Author)
             .Include(article => article.Category)
             .FirstOrDefaultAsync(article => article.Id == updateArticleDataDto.Id);
+        await PrepareArticleToUpdateAsync(article, updateArticleDataDto);
+        await _articleRepository.SaveChangesAsync();
+        var articleModel = _mapper.Map<ArticleModel>(article);
+        articleModel.Tags = _mapper.ProjectTo<TagModel>(article.Tags.AsQueryable());
+        return articleModel;
+    }
+
+    private async Task PrepareArticleToUpdateAsync(Article? article, UpdateArticleDataDto updateArticleDataDto)
+    {
         if (article == null)
         {
             throw new NotFoundException(nameof(article), updateArticleDataDto.Id);
@@ -162,10 +160,6 @@ public class ArticleService : IArticleService
         }
 
         article.Status = updateArticleDataDto.Status ?? article.Status;
-        await _articleRepository.SaveChangesAsync();
-        var articleModel = _mapper.Map<ArticleModel>(article);
-        articleModel.Tags = _mapper.ProjectTo<TagModel>(article.Tags.AsQueryable());
-        return articleModel;
     }
 
     public async Task<(int, double)> UpdateArticleAnalyticsAsync(UpdateArticleAnalyticsDto updateArticleAnalyticsDto)

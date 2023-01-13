@@ -1,7 +1,4 @@
 using WebPortal.Application.Extensions;
-using WebPortal.Application.Services;
-using WebPortal.Application.Services.Implementation;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
 using WebPortal.Domain.User;
 using WebPortal.Persistence.Infrastructure;

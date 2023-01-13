@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Interfaces;
 using WebPortal.Application.Dtos.Commentary;
-using WebPortal.Application.Services.Interfaces;
 
 namespace WebPortal.WebAPI.Controllers;
 [Route("api/[controller]/[action]")]

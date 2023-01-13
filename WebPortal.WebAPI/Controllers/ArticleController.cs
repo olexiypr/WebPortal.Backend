@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Interfaces;
 using WebPortal.Application.Dtos;
 using WebPortal.Application.Dtos.Article;
-using WebPortal.Application.Dtos.Complain;
-using WebPortal.Application.Dtos.Enums;
 using WebPortal.Application.Models.Article;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain.Enums;
 
 namespace WebPortal.WebAPI.Controllers;
@@ -35,7 +33,7 @@ public class ArticleController : BaseController
     }
     [HttpGet]
     [ActionName("popular")]
-    public async Task<ActionResult<IEnumerable<ArticlePreviewModel>>> GetPopularArticles([FromQuery] String period, 
+    public async Task<ActionResult<IEnumerable<ArticlePreviewModel>>> GetPopularArticles([FromQuery] string period, 
         [FromQuery] PaginationDto? paginationDto)
     {
         var articles = await _articleService.GetPopularArticlesAsync(period, paginationDto);

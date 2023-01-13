@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Services.Interfaces;
 using WebPortal.Application.Dtos;
-using WebPortal.Application.Services.Interfaces;
 using WebPortal.Domain;
 using WebPortal.Persistence.Infrastructure;
 
-namespace WebPortal.Application.Services.Implementation;
+namespace Services.Implementation;
 
 public class TagService : ITagService
 {

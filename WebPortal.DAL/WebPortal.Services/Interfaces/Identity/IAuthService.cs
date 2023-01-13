@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Http;
 using WebPortal.Application.Dtos.Auth;
 using WebPortal.Application.Dtos.User;
 using WebPortal.Application.Models;
 
-namespace WebPortal.Application.Services.Interfaces;
+namespace Services.Interfaces.Identity;
 
 public interface IAuthService
 {

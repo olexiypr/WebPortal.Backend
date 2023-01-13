@@ -1,9 +1,9 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
+using Services.Interfaces.Identity;
 using WebPortal.Application.Dtos.Auth;
 using WebPortal.Application.Dtos.User;
-using WebPortal.Application.Services.Interfaces;
 
 namespace WebPortal.WebAPI.Controllers;
 [Route("api/[controller]/[action]")]
