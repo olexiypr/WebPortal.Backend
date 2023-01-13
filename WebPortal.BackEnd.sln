@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebPortal.Tests", "WebPorta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPortal.UnitTests", "WebPortal.UnitTests\WebPortal.UnitTests.csproj", "{BF23D46B-8950-4463-8E73-9EC5BB422C9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPortal.Services", "WebPortal.DAL\WebPortal.Services\WebPortal.Services.csproj", "{63A5A94E-FDD2-4068-9F14-C0251F9FAF92}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPortal.Services", "WebPortal.Services\WebPortal.Services.csproj", "{63A5A94E-FDD2-4068-9F14-C0251F9FAF92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

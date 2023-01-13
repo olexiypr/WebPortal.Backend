@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Services.Interfaces;
+using WebPortal.Services.Interfaces;
 
 namespace WebPortal.WebAPI.Controllers;
 

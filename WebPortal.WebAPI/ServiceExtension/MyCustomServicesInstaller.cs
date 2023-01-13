@@ -1,7 +1,7 @@
-using Services.Implementation;
-using Services.Implementation.Identity;
-using Services.Interfaces;
-using Services.Interfaces.Identity;
+using WebPortal.Services.Implementation;
+using WebPortal.Services.Implementation.Identity;
+using WebPortal.Services.Interfaces;
+using WebPortal.Services.Interfaces.Identity;
 
 namespace WebPortal.WebAPI.ServiceExtension;
 

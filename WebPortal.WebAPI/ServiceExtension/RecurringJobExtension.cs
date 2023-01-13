@@ -1,5 +1,5 @@
 using Hangfire;
-using Services.Interfaces;
+using WebPortal.Services.Interfaces;
 
 namespace WebPortal.WebAPI.ServiceExtension;
 
